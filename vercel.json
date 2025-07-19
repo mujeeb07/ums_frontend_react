@@ -1,8 +1,12 @@
 {
     "rewrites": [
         {
+            "source": "/api/:path*",
+            "destination": "https://ums-backend-react.onrender.com/api/:path*"
+        },
+        {
             "source": "/(.*)",
-            "destination": "/index.html"
+            "destination": "/"
         }
     ]
 }
