@@ -16,7 +16,7 @@ import {
 } from "../features/admin/adminSlice";
 import { useNavigate } from "react-router-dom";
 import DeleteUserModal from "../Components/DeleteModal";
-import { Flip, Bounce, ToastContainer, toast } from 'react-toastify';
+import { Bounce, ToastContainer, toast } from 'react-toastify';
 
 interface UserType {
     _id: string;

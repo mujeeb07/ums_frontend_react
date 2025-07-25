@@ -2,7 +2,7 @@ import axios from "axios";
 
 
 const axiosinstance = axios.create({
-    baseURL: `${import.meta.env.BACKEND}`,
+    baseURL: import.meta.env.VITE_BACKEND,
     withCredentials: true,
 });
 
