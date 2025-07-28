@@ -1,5 +1,3 @@
-// import axios from "axios";
-
 import instance from "../config/axios";
 import type { UserFormData } from "../pages/AdminDashboard";
 
@@ -12,9 +10,8 @@ interface User {
     status?: boolean;
 }
 
-export const getAllusers = async () => {
+export const getAllusers = async () => {    
     const response = await instance.get("/admin/users");
-    // console.log("Get all users response:",response.data)
     return response.data
 }
 

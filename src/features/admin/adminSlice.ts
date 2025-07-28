@@ -106,7 +106,8 @@ const adminSlice = createSlice({
             .addCase(deleteUserByAdmin.rejected, (state, actoin) => {
                 state.isLoading = false;
                 state.error = typeof actoin.payload || "Error delete user"
-            })        
+            })    
+            // 
     }
 });
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { Search, Plus, Edit, Trash2, Shield, ShieldOff, User, Mail, UserCheck } from "lucide-react";
 import {
@@ -6,7 +6,8 @@ import {
     createNewUser,
     updateUserByAdmin,
     getAllUsers,
-    deleteUserByAdmin 
+    deleteUserByAdmin,
+    // searchUsers
 } from "../features/admin/adminThunk";
 import {
     reloadUsers,
@@ -17,6 +18,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import DeleteUserModal from "../Components/DeleteModal";
 import { Bounce, ToastContainer, toast } from 'react-toastify';
+
 
 interface UserType {
     _id: string;
@@ -53,7 +55,7 @@ interface UserFormProps {
     isEdit?: boolean;
 }
 
-const usersPerPage = 5;
+const usersPerPage = 7;
 
 // Reusable Modal Component
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
@@ -158,7 +160,6 @@ const AdminDashboard: React.FC = () => {
     const [showUserModal, setShowUserModal] = useState<boolean>(false);
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
-    const [filteredUsers, setFilteredUsers] = useState<UserType[]>([]);
 
     // Delete Modal state
     const [isDeleteModalOpen, setIsDeleteMdodal] = useState<boolean>(false);
@@ -171,7 +172,7 @@ const AdminDashboard: React.FC = () => {
         status: true
     });
 
-    // Pagnation setup
+    // Pagination setup
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
@@ -194,21 +195,39 @@ const AdminDashboard: React.FC = () => {
         fetchUsers();
     }, [dispatch, currentPage]);
 
-    useEffect(() => {
-        if (users) {
-            const mappedUsers: UserType[] = users.map((user) => ({
-                ...user,
-                role: (user.role === 'admin' || user.role === 'user' ? user.role : 'user') as 'user' | 'admin',
-                status: (user as any).status ?? true,
-            }));
-            const filtered = mappedUsers.filter(user =>
-                user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.role?.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setFilteredUsers(filtered);
-        }
-    }, [users, searchTerm, dispatch]);
+    // useEffect(() => {
+    //     if (users) {
+    //         if(filteredUsers){}
+    //         console.log("FILTERED USERS:", filteredUsers)
+    //         const mappedUsers: UserType[] = users.map((user) => ({
+    //             ...user,
+    //             role: (user.role === 'admin' || user.role === 'user' ? user.role : 'user') as 'user' | 'admin',
+    //             status: (user as any).status ?? true,
+    //         }));
+    //         const filtered = mappedUsers.filter(user =>
+    //             user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //             user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    //         );
+    //         setFilteredUsers(filtered);
+           
+    //     }
+    // }, [users, searchTerm, dispatch]);
+
+
+    const filteredUsers = useMemo(() => {
+        if (!users) return [];
+
+        const mappedUsers: UserType[] = users.map((user) => ({
+            ...user,
+            role: (user.role === 'admin' || user.role === 'user' ? user.role : 'user') as 'user' | 'admin',
+            status: (user as any).status ?? true,
+        }));
+
+        return mappedUsers.filter(user =>
+            user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [users, searchTerm]);
 
     const resetForm = () => {
         setFormData({
@@ -254,7 +273,7 @@ const AdminDashboard: React.FC = () => {
         }
         return true
     }
-
+   
     const handleSubmit = async () => {
         try {
             if (isEditMode) {
@@ -299,7 +318,6 @@ const AdminDashboard: React.FC = () => {
     }
 
     const handleConfirmDelete = async () => {
-        
         try {
             const selectedUserData = users.find((user) => user._id == selectedUser?._id);
             if (selectedUserData) {
@@ -407,7 +425,18 @@ const AdminDashboard: React.FC = () => {
 
                 {/* Users Table */}
                 <div className="bg-[#1e1e2f] rounded-2xl shadow-xl border border-gray-700 overflow-hidden">
+
                     <div className="overflow-x-auto">
+
+                        {filteredUsers.length === 0 ? (
+                            <div className="text-center py-12">
+                                <User className="mx-auto h-12 w-12 text-gray-500" />
+                                <h3 className="mt-4 text-sm font-medium text-gray-300">No users found</h3>
+                                <p className="mt-1 text-sm text-gray-500">
+                                    {searchTerm ? 'Try adjusting your search terms' : 'Get started by adding a new user'}
+                                </p>
+                            </div>
+                        ) : (
                         <table className="min-w-full divide-y divide-gray-700">
                             <thead className="bg-[#2e2e3e]">
                                 <tr>
@@ -435,7 +464,7 @@ const AdminDashboard: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody className="bg-[#1e1e2f] divide-y divide-gray-700">
-                                {users.map((user) => (
+                                {filteredUsers.map((user) => (
                                     <tr key={user._id} className="hover:bg-[#2e2e3e] transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
@@ -514,16 +543,8 @@ const AdminDashboard: React.FC = () => {
                                 ))}
                             </tbody>
                         </table>
-
-                        {filteredUsers.length === 0 && (
-                            <div className="text-center py-12">
-                                <User className="mx-auto h-12 w-12 text-gray-500" />
-                                <h3 className="mt-4 text-sm font-medium text-gray-300">No users found</h3>
-                                <p className="mt-1 text-sm text-gray-500">
-                                    {searchTerm ? 'Try adjusting your search terms' : 'Get started by adding a new user'}
-                                </p>
-                            </div>
                         )}
+
                     </div>
                 </div>
 

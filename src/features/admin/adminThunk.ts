@@ -4,7 +4,7 @@ import {
     updateUserStatus as apiUpdaterStatus,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
 } from "../../services/adminService";
 import type { User } from "../types/commontypes";
 import type { UserFormData } from "../../pages/AdminDashboard";

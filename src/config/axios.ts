@@ -1,6 +1,5 @@
 import axios from "axios";
 
-
 const axiosinstance = axios.create({
     baseURL: import.meta.env.VITE_BACKEND,
     withCredentials: true,
@@ -17,6 +16,4 @@ axiosinstance.interceptors.request.use(
     (error) => Promise.reject(error)
 );
   
-
-
 export default axiosinstance
