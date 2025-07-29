@@ -23,7 +23,6 @@ export default function UserProfile() {
     const [email, setEmail] = useState("");
     const [imageUrl, setImageUrl] = useState("");
     const [uploading, setUploading] = useState(false);
-    // const [dark, setDark] = useState(true)
 
     useEffect(() => {
         dispatch(getUserProfile());
@@ -68,8 +67,38 @@ export default function UserProfile() {
         }
     };
 
+    const validateFormData = () => {
+        if (!email.trim()) {
+            
+            toast.error("Email is required");
+            return false;
+        }
+        if (!username.trim()) {
+            toast.error("username is required");
+            return false;
+        }
+        return true;
+
+    }
+
     const handleSave = () => {
-        if (!user?._id) return;
+        if (!user?._id) { 
+            toast.error("User Not found", {
+                position: "top-right",
+                autoClose: 4000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                transition: Bounce,
+                theme: "dark",
+            });
+            return;
+        } 
+
+        if (!validateFormData()) return;
+
         dispatch(udpateCurrentUser({
             userId: user._id,
             username,
@@ -78,6 +107,8 @@ export default function UserProfile() {
             status: user.status,
         }))
         setEditMode(false);
+        toast.success("User data saved");
+        navigate("/users/profile")
     };
 
     const handleCancel = () => {
@@ -93,7 +124,6 @@ export default function UserProfile() {
             dispatch(logout());
             setUserLogout()
             navigate("/")
-
         } catch (error) {
             console.log(error)
         }

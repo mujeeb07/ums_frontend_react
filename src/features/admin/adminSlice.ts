@@ -91,7 +91,8 @@ const adminSlice = createSlice({
             })
             .addCase(updateUserByAdmin.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = typeof action.payload || "Failed udpate user";
+                state.error = "Failed udpate user";
+                console.log("admin slice action:", action)
             })
 
             // Delete User

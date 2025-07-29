@@ -13,7 +13,6 @@ export const loginUser = async (data: LoginPayload) => {
     return response.data;
 }
 
-
 export const fetchUserProfile = async () => {
     const response = await axiosinstance.get("/users/profile");
     return response.data;
@@ -23,7 +22,6 @@ export const fetchAdminProfile = async () => {
     const response = await axiosinstance.get("/admin/profile");
     return response.data;
 }
-
 
 export const lgoutUser = async () => {
     const response = await axiosinstance.post("/auth/logout");

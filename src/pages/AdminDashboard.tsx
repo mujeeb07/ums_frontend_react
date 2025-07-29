@@ -195,25 +195,6 @@ const AdminDashboard: React.FC = () => {
         fetchUsers();
     }, [dispatch, currentPage]);
 
-    // useEffect(() => {
-    //     if (users) {
-    //         if(filteredUsers){}
-    //         console.log("FILTERED USERS:", filteredUsers)
-    //         const mappedUsers: UserType[] = users.map((user) => ({
-    //             ...user,
-    //             role: (user.role === 'admin' || user.role === 'user' ? user.role : 'user') as 'user' | 'admin',
-    //             status: (user as any).status ?? true,
-    //         }));
-    //         const filtered = mappedUsers.filter(user =>
-    //             user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //             user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    //         );
-    //         setFilteredUsers(filtered);
-           
-    //     }
-    // }, [users, searchTerm, dispatch]);
-
-
     const filteredUsers = useMemo(() => {
         if (!users) return [];
 
@@ -367,11 +348,11 @@ const AdminDashboard: React.FC = () => {
         );
     }
 
-    if (error) {
+    if (error) {    
         return (
             <div className="min-h-screen bg-gradient-to-b from-[#0f0c29] to-[#302b63] flex items-center justify-center">
                 <div className="text-center">
-                    <div className="bg-red-900 border border-red-700 text-red-300 px-6 py-4 rounded-lg">
+                    <div className="bg-red-900 border border-red-700 text-red-300 px-9 py-7 rounded-lg">
                         <p className="font-medium">Error loading users</p>
                         <p className="text-sm">{error}</p>
                     </div>
