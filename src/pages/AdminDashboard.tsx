@@ -154,7 +154,7 @@ const UserForm: React.FC<UserFormProps> = ({ formData, setFormData, onSubmit, on
 
 const AdminDashboard: React.FC = () => {
     const dispatch = useAppDispatch();
-    const { users, isLoading, error } = useAppSelector((state) => state.admin);
+    const { users, isLoading } = useAppSelector((state) => state.admin);
 
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [showUserModal, setShowUserModal] = useState<boolean>(false);
@@ -240,18 +240,54 @@ const AdminDashboard: React.FC = () => {
     };
     
     const validateFormData = () => {
-        if (!formData.username?.trim()) {
+        const minUsernameLength = 3;
+        const maxUsernameLength = 20;
+        const minPasswordLength = 6;
+        const maxPasswordLength = 12;
+        const validUsername = /^[0-9A-Za-z]{3,16}$/;
+        const validEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        toast.dismiss();
+        const trimmedUsername = formData.username.trim();
+        const trimmedEmail = formData.email.trim();
+        const trimmedPassword = formData.password ? formData.password : "";
+        
+        if (!trimmedUsername) {
+            console.log("trimmed username:",trimmedUsername)
             toast.error("Username is required");
             return false;
         }
-        if (!formData.email?.trim()) {
+        if (trimmedUsername.length < minUsernameLength || trimmedUsername.length > maxUsernameLength) {
+            toast.error(`Username must be between ${minUsernameLength} and ${maxUsernameLength} characters long`);
+            return false;
+        }
+
+        if (!validUsername.test(trimmedUsername)) {
+            toast.error("Username can only contain letters and numbers (3-16 characters)");
+            return false;
+        }
+        
+        if (!trimmedEmail) {
             toast.error("Email is required");
             return false;
         }
-        if (!formData.password?.trim() && !isEditMode) {
-            toast.error("Password is required");
-            return false
+
+        if (!validEmail.test(trimmedEmail)) {
+            toast.error("Please enter valid email address");
+            return false;
         }
+        if (!isEditMode) {
+            if (!trimmedPassword) {
+                toast.error("Password is required");
+                return false
+            }
+            if (trimmedPassword.length < minPasswordLength || trimmedPassword.length > maxPasswordLength) {
+                toast.error(`Password must be between ${minUsernameLength} and ${maxUsernameLength} characters long`);
+                return false;
+            }
+
+        }
+
         return true
     }
    
@@ -267,24 +303,21 @@ const AdminDashboard: React.FC = () => {
                             updateUserByAdmin(updatedUserFormData)).unwrap()
                         dispatch(updateUser(response))
                         toast("Updated User Data");
-                        navigate("/admin/dashboard")
                     }
                 }
             } else {
                 console.log("Adding user:", formData);
                 if(!validateFormData()) return
-                const response = await dispatch(createNewUser({ formData })).unwrap();
+                const response = await dispatch(createNewUser({ formData })).unwrap()
                 console.log(response)
                 toast.success("New user added");
             }
-        } catch (error) {
-            if (isEditMode) {
-                toast.error("Update user failed, Try again.");
-            } else {
-                toast.error("Register User failed, Try again.");
-            }
-            console.log(error)
-            return; 
+            navigate("/admin/dashboard")
+        } catch (error: any) {
+            console.log("Full error object:", error);
+            const message = error.message;  
+            toast.error(message);
+            return;
         }
         handleCloseModal();
     };
@@ -348,18 +381,18 @@ const AdminDashboard: React.FC = () => {
         );
     }
 
-    if (error) {    
-        return (
-            <div className="min-h-screen bg-gradient-to-b from-[#0f0c29] to-[#302b63] flex items-center justify-center">
-                <div className="text-center">
-                    <div className="bg-red-900 border border-red-700 text-red-300 px-9 py-7 rounded-lg">
-                        <p className="font-medium">Error loading users</p>
-                        <p className="text-sm">{error}</p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    // if (error) {    
+    //     return (
+    //         <div className="min-h-screen bg-gradient-to-b from-[#0f0c29] to-[#302b63] flex items-center justify-center">
+    //             <div className="text-center">
+    //                 <div className="bg-red-900 border border-red-700 text-red-300 px-9 py-7 rounded-lg">
+    //                     <p className="font-medium">Error loading users</p>
+    //                     <p className="text-sm">{error}</p>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     );
+    // }
 
     return (
     

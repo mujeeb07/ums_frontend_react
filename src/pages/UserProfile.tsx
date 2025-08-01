@@ -43,13 +43,10 @@ export default function UserProfile() {
         setUploading(true);
         try {
             const result = await uploadImageToCloudinary(file);
-            console.log('Cloudinary result at the component:', result)
             if (result) {
                 setImageUrl(result);
             }
         } catch (err) {
-            console.error("Image upload failed", err);
-            // toast("Image upload failed")
             toast.error(`${error}!` || "Image upload failed", {
                 position: "top-right",
                 autoClose: 5000,
@@ -69,7 +66,6 @@ export default function UserProfile() {
 
     const validateFormData = () => {
         if (!email.trim()) {
-            
             toast.error("Email is required");
             return false;
         }
@@ -78,37 +74,42 @@ export default function UserProfile() {
             return false;
         }
         return true;
-
     }
 
-    const handleSave = () => {
-        if (!user?._id) { 
-            toast.error("User Not found", {
-                position: "top-right",
-                autoClose: 4000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                transition: Bounce,
-                theme: "dark",
-            });
-            return;
-        } 
+    const handleSave = async() => {
 
         if (!validateFormData()) return;
+        
+        try {
+            if (!user?._id) { 
+                toast.error("User Not found", {
+                    position: "top-right",
+                    autoClose: 4000,
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    transition: Bounce,
+                    theme: "dark",
+                });
+                return;
+            } 
+            await dispatch(udpateCurrentUser({
+                userId: user._id,
+                username,
+                email,
+                image: imageUrl,
+                status: user.status,
+            })).unwrap();
 
-        dispatch(udpateCurrentUser({
-            userId: user._id,
-            username,
-            email,
-            image: imageUrl,
-            status: user.status,
-        }))
-        setEditMode(false);
-        toast.success("User data saved");
-        navigate("/users/profile")
+            setEditMode(false);
+            toast.success("User data saved");
+            navigate("/users/profile");
+
+        } catch (error: any) {
+            toast.error(error)
+        }
     };
 
     const handleCancel = () => {
@@ -125,7 +126,7 @@ export default function UserProfile() {
             setUserLogout()
             navigate("/")
         } catch (error) {
-            console.log(error)
+            toast.error("something went wrong while logout")
         }
     }
 

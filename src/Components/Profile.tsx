@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../redux/store';
 import { User } from "lucide-react";
 
-
 interface ProfileProps {
     imageUrl: string;
     editMode: boolean;

@@ -10,7 +10,7 @@ export const getUserProfile= createAsyncThunk<
 >('users/getUserProfile', async (_, thunkAPI) => {
     try {
         const data = await fetchUserProfile();
-        console.log("Data from the get current user:", data);
+        // console.log("Data from the get current user:", data);
         return data as User;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "Failed to fetch current user";
@@ -25,7 +25,7 @@ export const getAdminProfile = createAsyncThunk<
 >('users/getAdminProfile', async (_, thunkAPI) => {
     try {
         const data = await fetchAdminProfile();
-        console.log("Data from the get current user:", data);
+        // console.log("Data from the get current user:", data);
         return data as User;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "Failed to fetch current user";
@@ -38,12 +38,17 @@ export const udpateCurrentUser = createAsyncThunk<
     User,
     { userId: string; username: string; email: string, image: string, status: boolean },
     { rejectValue: string }
->('user/udpateCurrentUser', async ({ userId, username, email, image, status }, thunkAPI) => {
+>(
+    'user/udpateCurrentUser',
+    async ({ userId, username, email, image, status }, {rejectWithValue}) => {
     try {
         const data = await updateUser(userId, { username, email, image, status });
         return data as User;
     } catch (error: any) {
-        return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
+        // console.log("Update thunk error:", error)
+        const message = error.response.data.message.message;
+        // console.log("Actual error message from backend:",message)
+        return rejectWithValue(message);
     }
 });
 

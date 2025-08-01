@@ -23,11 +23,9 @@ export const getAllUsers = createAsyncThunk<
     async ({ page, limit }, { rejectWithValue }) => {
         try {
             const response = await fetchUsers(page, limit);
-
             return response as GetAllUsersResponse;
         } catch (error: any) {
-            const message =
-                error.response?.data?.message || error.message || "Failed to fetch users";
+            const message = error.response?.data?.message || error.message || "Failed to fetch users";
             return rejectWithValue(message);
         }
     }
@@ -41,12 +39,11 @@ export const updateUserStatus = createAsyncThunk<
     "users/updateUserStatus",
     async ({ userId }, { rejectWithValue }) => {
         try {
-            const response = await apiUpdaterStatus(userId);
-            console.log("Thunk updateuserstatus:", response);
+            await apiUpdaterStatus(userId);
+            // console.log("Thunk updateuserstatus:", response);
             return { userId }
         } catch (error: any) {
-            const message =
-                error.response?.data?.message || error.message || "Failed to update user status";
+            const message = error.response?.data?.message || error.message || "Failed to update user status";
             return rejectWithValue(message);
         }
     }
@@ -61,10 +58,11 @@ export const createNewUser = createAsyncThunk<
     async ({ formData }, { rejectWithValue }) => {
         try {
             const response = await createUser(formData);
-            console.log("Thunk create user response:", response);
+            // console.log("Thunk create user response:", response);
             return response
         } catch (error: any) {
-            const message = error.response?.data?.message || error.message || "Failed to create new user";
+            console.log("Create user by admin error:", error.response.data.message)
+            const message = error.response.data.message;
             return rejectWithValue(message)
         }
         
@@ -74,12 +72,12 @@ export const createNewUser = createAsyncThunk<
 export const updateUserByAdmin = createAsyncThunk(
     "users/updateUser",
     async (updatedUserFormData: UserFormData, { rejectWithValue }) => {
-        console.log("user data at the udpate user thunk:", updatedUserFormData);
+        // console.log("user data at the udpate user thunk:", updatedUserFormData);
         try {
             const response = await updateUser(updatedUserFormData);
             return response as UserFormData;
         } catch (error: any) {
-            console.log(error);
+            // console.log(error);
             const message = error.response?.data?.message || error.message || "Failed to update user";
             return rejectWithValue(message)
         }
@@ -90,13 +88,13 @@ export const deleteUserByAdmin = createAsyncThunk
   (
     "users/deleteUser",
     async (userId: string, { rejectWithValue }) => {
-        console.log("Delete User Id:", userId);
+        // console.log("Delete User Id:", userId);
         try {
             const response = await deleteUser(userId);
-            console.log("Delte user response:", response);
+            // console.log("Delte user response:", response);
             return response
         } catch (error: any) {
-            console.log(error);
+            // console.log(error);
             const message = error.response?.data?.message || error.message || "Failed delete user";
             return rejectWithValue(message)
         }
