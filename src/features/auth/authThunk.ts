@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { lgoutUser, loginUser, registerUser } from "../../services/authServices";
 import type { RegisterPayload } from "../../types/auth";
+import { setUserLogout } from "./authSlice";
 
 
 interface LoginData {
@@ -49,8 +50,6 @@ export const login = createAsyncThunk<
 );
 
 
-
-
 export const logout = createAsyncThunk<
     void,
     void,
@@ -60,6 +59,7 @@ export const logout = createAsyncThunk<
     async (_, { rejectWithValue }) => {
         try {
             await lgoutUser();
+            setUserLogout()
         } catch (error: any) {
             // console.log("Logout error:", error);
             const message = error.response?.data?.message || error.message || "Failed to logout user";
@@ -67,3 +67,5 @@ export const logout = createAsyncThunk<
         }
     }
 );
+
+   

@@ -88,7 +88,7 @@ export default function AdminProfile() {
     const handleLogout = () => {
         try {
             dispatch(logout());
-            setUserLogout()
+            dispatch(setUserLogout())
             navigate("/")
         } catch (error) {
             console.log(error)

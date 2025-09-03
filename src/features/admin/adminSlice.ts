@@ -35,8 +35,8 @@ const adminSlice = createSlice({
         },
         reloadUsers: (state, action) => {
             state.users = state.users.filter((user) => user._id != action.payload)
-        }
-
+        },
+        
     },
     extraReducers: (builder) => {
         builder
@@ -108,7 +108,6 @@ const adminSlice = createSlice({
                 state.isLoading = false;
                 state.error = typeof actoin.payload || "Error delete user"
             })    
-            // 
     }
 });
 

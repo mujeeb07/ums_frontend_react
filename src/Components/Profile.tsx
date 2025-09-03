@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../redux/store';
 import { User } from "lucide-react";
 
@@ -34,6 +34,7 @@ export const Profile: React.FC<ProfileProps> = ({
     handleCancel,
     handleTheme,
 }) => {
+    
     const isDarkTheme = useSelector((state: RootState) => state.user.isDarkTheme);
     return (
         <>

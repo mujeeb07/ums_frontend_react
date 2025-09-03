@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks/hooks";
 import { Search, Plus, Edit, Trash2, Shield, ShieldOff, User, Mail, UserCheck } from "lucide-react";
 import {
@@ -7,7 +7,6 @@ import {
     updateUserByAdmin,
     getAllUsers,
     deleteUserByAdmin,
-    // searchUsers
 } from "../features/admin/adminThunk";
 import {
     reloadUsers,
@@ -156,7 +155,8 @@ const AdminDashboard: React.FC = () => {
     const dispatch = useAppDispatch();
     const { users, isLoading } = useAppSelector((state) => state.admin);
 
-    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    console.log(searchQuery)
     const [showUserModal, setShowUserModal] = useState<boolean>(false);
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
@@ -172,7 +172,7 @@ const AdminDashboard: React.FC = () => {
         status: true
     });
 
-    // Pagination setup
+    // Pagination setup.
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
@@ -181,7 +181,7 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await dispatch(getAllUsers({ page: currentPage, limit: usersPerPage })).unwrap();
+                const response = await dispatch(getAllUsers({ searchQuery: searchQuery, page: currentPage, limit: usersPerPage })).unwrap();
                 console.log("Received:", response);
                 const { users, total } = response
                 dispatch(setUsers(users))
@@ -193,22 +193,7 @@ const AdminDashboard: React.FC = () => {
         };
 
         fetchUsers();
-    }, [dispatch, currentPage]);
-
-    const filteredUsers = useMemo(() => {
-        if (!users) return [];
-
-        const mappedUsers: UserType[] = users.map((user) => ({
-            ...user,
-            role: (user.role === 'admin' || user.role === 'user' ? user.role : 'user') as 'user' | 'admin',
-            status: (user as any).status ?? true,
-        }));
-
-        return mappedUsers.filter(user =>
-            user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [users, searchTerm]);
+    }, [dispatch, currentPage, searchQuery]);
 
     const resetForm = () => {
         setFormData({
@@ -340,7 +325,6 @@ const AdminDashboard: React.FC = () => {
                 dispatch(reloadUsers(response.user._id));
                 setSelectedUser(null);
                 setIsDeleteMdodal(false)
-               await dispatch(getAllUsers({page:1,limit:5}))
             }
         } catch (error) {
             console.log(error, "erro deleting user");
@@ -381,19 +365,6 @@ const AdminDashboard: React.FC = () => {
         );
     }
 
-    // if (error) {    
-    //     return (
-    //         <div className="min-h-screen bg-gradient-to-b from-[#0f0c29] to-[#302b63] flex items-center justify-center">
-    //             <div className="text-center">
-    //                 <div className="bg-red-900 border border-red-700 text-red-300 px-9 py-7 rounded-lg">
-    //                     <p className="font-medium">Error loading users</p>
-    //                     <p className="text-sm">{error}</p>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     );
-    // }
-
     return (
     
         <div className="min-h-screen bg-gradient-to-b from-[#0f0c29] to-[#302b63] text-white">
@@ -421,8 +392,8 @@ const AdminDashboard: React.FC = () => {
                                 <input
                                     type="text"
                                     placeholder="Search users by name, email, or role..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                     className="w-full pl-10 pr-4 py-2 bg-[#2e2e3e] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 border border-gray-600"
                                 />
                             </div>
@@ -442,12 +413,12 @@ const AdminDashboard: React.FC = () => {
 
                     <div className="overflow-x-auto">
 
-                        {filteredUsers.length === 0 ? (
+                        {users.length === 0 ? (
                             <div className="text-center py-12">
                                 <User className="mx-auto h-12 w-12 text-gray-500" />
                                 <h3 className="mt-4 text-sm font-medium text-gray-300">No users found</h3>
                                 <p className="mt-1 text-sm text-gray-500">
-                                    {searchTerm ? 'Try adjusting your search terms' : 'Get started by adding a new user'}
+                                    {searchQuery ? 'Try adjusting your search terms' : 'Get started by adding a new user'}
                                 </p>
                             </div>
                         ) : (
@@ -478,7 +449,7 @@ const AdminDashboard: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody className="bg-[#1e1e2f] divide-y divide-gray-700">
-                                {filteredUsers.map((user) => (
+                                {users.map((user) => (
                                     <tr key={user._id} className="hover:bg-[#2e2e3e] transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">

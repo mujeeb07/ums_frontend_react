@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import type { RegisterPayload, LoginPayload } from "../types/auth";
 import { useNavigate } from "react-router-dom";
 import { login, register } from "../features/auth/authThunk";
 import { useAppDispatch } from "../hooks/hooks";
 import { setUserAuth } from "../features/auth/authSlice";
 import { Flip, ToastContainer, toast } from 'react-toastify';
+import { useSelector } from "react-redux";
 
 
 
@@ -15,6 +17,10 @@ export default function AuthForm() {
     email: "",
     password: ""
   });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const user = useSelector((state: any) => state.user);
+  console.log("USER DATA:", user)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -95,10 +101,12 @@ export default function AuthForm() {
         });
 
         toast.success("Logged In successfully");
+        console.log("Access Token:", res.token);
             
+        dispatch(setUserAuth(res.token));
+
         res.role === "admin" ? navigate('/admin/profile') : navigate("/users/profile");
 
-        dispatch(setUserAuth(res.payload.token));
       } else {
 
         const registerData: RegisterPayload = {
@@ -189,13 +197,20 @@ export default function AuthForm() {
           {/* )} */}
           <div className="relative">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Enter your password"
               value={formData.password}
               onChange={handleChange}
               className="px-4 py-2 rounded-md bg-[#2e2e3e] w-full focus:outline-none"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+            >
+              {showPassword ? <VisibilityOff /> : <Visibility />}
+            </button>
           </div>
 
           <button

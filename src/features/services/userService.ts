@@ -1,7 +1,7 @@
 import axiosinstance from "../../config/axios";
 
-export const fetchUsers = async (page: number, limit:number) => {
-    const response = await axiosinstance.get(`admin/users?page=${page}&limit=${limit}`);
+export const fetchUsers = async (searchQuery: string,page: number, limit:number) => {
+    const response = await axiosinstance.get(`admin/users?query=${searchQuery}&page=${page}&limit=${limit}`);
     return response.data;
 }
 

@@ -26,7 +26,7 @@ export default function UserProfile() {
 
     useEffect(() => {
         dispatch(getUserProfile());
-    }, [dispatch]);
+    }, []);
 
     useEffect(() => {
         if (user) {
@@ -122,8 +122,9 @@ export default function UserProfile() {
     // Logout
     const handleLogout = () => {
         try {
+            console.log("Logout handler.......")
             dispatch(logout());
-            setUserLogout()
+            dispatch(setUserLogout())
             navigate("/")
         } catch (error) {
             toast.error("something went wrong while logout")

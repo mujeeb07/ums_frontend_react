@@ -10,19 +10,21 @@ import type { User } from "../types/commontypes";
 import type { UserFormData } from "../../pages/AdminDashboard";
 
 interface GetAllUsersResponse {
+    searchQuery: string;
     users: User[];
     total: number;
 }
 
 export const getAllUsers = createAsyncThunk<
     GetAllUsersResponse,
-    { page: number; limit: number },
+    { searchQuery: string; page: number; limit: number },
     { rejectValue: string }
 >(
     "users/getAll",
-    async ({ page, limit }, { rejectWithValue }) => {
+    async ({ searchQuery, page, limit }, { rejectWithValue }) => {
+        console.log("SERCH_QUERY:", searchQuery, page, limit)
         try {
-            const response = await fetchUsers(page, limit);
+            const response = await fetchUsers(searchQuery, page, limit);
             return response as GetAllUsersResponse;
         } catch (error: any) {
             const message = error.response?.data?.message || error.message || "Failed to fetch users";
@@ -100,5 +102,3 @@ export const deleteUserByAdmin = createAsyncThunk
         }
     }
 );
-
-
